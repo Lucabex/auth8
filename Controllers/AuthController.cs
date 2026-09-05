@@ -96,4 +96,27 @@ public class AuthController : ControllerBase
             return StatusCode(500,"Internal error ,Plewase try agin later");
         }
     }
+    [HttpGet("puzzle")]
+    public async Task<IActionResult> GetPuzzle()
+    {
+        try
+        {
+            var client= _factory.CreateClient();
+            var url = "https://lichess.org/api/puzzle/daily";
+            var response = await client.GetFromJsonAsync<PuzzleDaily>(url);
+            if(response?.Solution==null || response?.Fen == null)
+            {
+                return StatusCode(503,"service not available");
+            }
+            return Ok(response);
+        }
+        catch(HttpRequestException ex)
+        {
+            return StatusCode(503,"Service unavilabe , try later");
+        }
+        catch(Exception ex)
+        {
+            return StatusCode(500,"Internal error , try again later");
+        }
+    }
 }
